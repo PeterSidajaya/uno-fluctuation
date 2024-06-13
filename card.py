@@ -6,8 +6,8 @@ class Card:
         """_summary_
 
         Args:
-            colour (str): 'c', 'd', 'h', 's', or 'w' for 8
-            number (str): '2' to '10', 'J', 'Q', 'K', 'A'
+            colour (str): 'b', 'g', 'r', 'y', or 'w'
+            number (str): '1' to '9', 'p','r','s','w','W'
         """
         self.suite = suite
         self.number = number
@@ -16,11 +16,12 @@ class Card:
         self.index = Helper.find_card_index(self.name)
         
     def generate_legal(self):
-        if self.name == 'w8':
-            return [0,] * 48 + [1,] * 4
+        """Generate the legal move after this card"""
+        if self.name == 'ww' or self.name == 'wW':
+            return [0,] * config.num_of_norm + [1,] * 8         # The legal moves will be added in Game.generate_wildcard_legal()
         else:
-            lst = [0,] * 48 + [1,] * 4
-            for index in range(48):
+            lst = [0,] * config.num_of_norm + [1,] * 8
+            for index in range(config.num_of_norm):
                 card = Helper.find_card(index)
                 if card[0] == self.suite:
                     lst[index] = 1
@@ -45,12 +46,17 @@ class Helper:
     actions = []
     cards = []
     for i in config.suites:
+        if i == 'w':
+            continue
         for j in config.numbers:
-            if j != '8':
-                cards.append(i+j)
-                actions.append(i+j)
-    cards.append('w8')
-    actions += ['w8c','w8d','w8h','w8s']
+            if j == 'w' or j == 'W':
+                continue
+            cards.append(i+j)
+            actions.append(i+j)
+    cards.append('ww')
+    actions += ['wwb','wwg','wwr','wwy']
+    cards.append('wW')
+    actions += ['wWb','wWg','wWr','wWy']
 
     def find_card_index(name):
         return Helper.cards.index(name)
@@ -62,8 +68,10 @@ class Helper:
         return Helper.cards[index]
 
     def find_card_of_action(action_name):
-        if action_name[0:2] == 'w8':
-            return Card('w','8')
+        if action_name[0:2] == 'ww':
+            return Card('w','w')
+        elif action_name[0:2] == 'wW':
+            return Card('w','W')
         else:
             index = Helper.find_action_index(action_name)
             card = Helper.find_card(index)
